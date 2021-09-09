@@ -1,1 +1,0 @@
-# AllenNLP: registry design `Registrable`
