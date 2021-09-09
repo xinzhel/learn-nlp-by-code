@@ -60,11 +60,8 @@ args.func(args)
 ```
 
 **Creating the python script**
-According to the analysis, I try to call `python` command for training by replicating the parsing code snippet in the `main` method in `allennlp.commands` and training code in the `allennlp.commands.train`. 
+According to the analysis, I make the transparent and [simple python script](scripts/main_clean_train.py) which achieve the same behaviour of `allennlp train`.
 
-Except transparency, it has the following benefits:
-1. use 
-2. no nested parsers
 
 
 ## (Optional) AllenNLP registration design
