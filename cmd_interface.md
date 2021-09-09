@@ -10,8 +10,7 @@ I found that answering the first question is enough to create customized python 
 ## Analyzing how `allennlp train/predict/...` commmands work?
 Here, I use `allennlp train` command as example.
 
-**Where is the entry point?**
-
+### Where is the entry point?
 Firstly, I need to trace where the main command `allennlp` comes from. Since `allennlp` is recognized by bash terminal, it should be defined in the python bin path. Then, I did find it in `python/bin/allennlp`. This file is indeed a python file with shebang (#!) indicating the python path. When this file is runned, `allennlp/__main__.py` is indeed defined as the entry point with `if __name__ == "__main__":`. 
 
 I define a python script which could be runned in a debugging mode to see the details step by step.
@@ -35,8 +34,7 @@ sys.argv = [
 main()
 ```
 
-**How the subcommands (e.g., `train`) and arguments (e.g., config path) are parsed?**
-
+### How the subcommands (e.g., `train`) and arguments (e.g., config path) are parsed?
 In `allennlp/__main__.py`, it calls `allennlp.commands.main()`, the subcommand and arguments ared processed here by calling `parser, args = parse_args(prog)`. `train` could be used as the subcommand due to the usage of `argparse` `subparsers`. The detail is explained with my simplified code snippet below.
 
 ```
@@ -59,7 +57,7 @@ args = parser.parse_args()
 args.func(args)
 ```
 
-**Creating the python script**
+### Creating the python script
 According to the analysis, I make the transparent and [simple python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py) which achieve the same behaviour of `allennlp train`.
 
 
