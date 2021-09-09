@@ -13,7 +13,7 @@ Here, I use `allennlp train` command as example.
 ### Where is the entry point?
 Firstly, I need to trace where the main command `allennlp` comes from. Since `allennlp` is recognized by bash terminal, it should be defined in the python bin path. Then, I did find it in `python/bin/allennlp`. This file is indeed a python file with shebang (#!) indicating the python path. When this file is runned, `allennlp/__main__.py` is indeed defined as the entry point with `if __name__ == "__main__":`. 
 
-I define a python script which could be runned in a debugging mode to see the details step by step.
+I define a python script which could be runed in a debugging mode to see the details step by step.
 
 ```
 from allennlp.commands import main
@@ -63,7 +63,7 @@ According to the analysis, I make the transparent and [simple python script](htt
 
 
 ## (Optional) AllenNLP registration design
-All the subclasses are registered in the high-level abstract class, and they could be easilly assessed. For example, we could access the `allennlp.commands.train.Train` class via `Subcommand.by_name('train')` or `allennlp.commands.predict.Predict` class via `Subcommand.by_name('predict')`. It's kinda like a factory with all the templates (i.e., the subclasses), and you can create instances as many as you want from one place. The offical guide has discussed the usage of [registration](https://guide.allennlp.org/using-config-files#3).
+All the subclasses are registered in the high-level abstract class, and they could be easilly assessed. For example, we could access the `allennlp.commands.train.Train` class via `Subcommand.by_name('train')` or `allennlp.commands.predict.Predict` class via `Subcommand.by_name('predict')`. It's kinda like a factory with all the templates (i.e., the subclasses), and you can create instances as many as you want from one place. The official guide has discussed the usage of [registration](https://guide.allennlp.org/using-config-files#3).
 
 
 
