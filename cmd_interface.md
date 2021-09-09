@@ -1,4 +1,4 @@
-# AllenNLP: how to use config file explicitly via customized python script?
+# AllenNLP: how to use config file explicitly via simple, customized python script?
 In order to use config file explicitly via customized python script, I wanna solve the following two questions:
 
 1. How `AllenNLP` commands and subcommands work (i.e., `allennlp train ...` for training)? 
@@ -60,7 +60,7 @@ args.func(args)
 ```
 
 **Creating the python script**
-According to the analysis, I make the transparent and [simple python script](scripts/main_clean_train.py) which achieve the same behaviour of `allennlp train`.
+According to the analysis, I make the transparent and [simple python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py) which achieve the same behaviour of `allennlp train`.
 
 
 
