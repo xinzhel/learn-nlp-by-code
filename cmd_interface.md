@@ -5,9 +5,8 @@ In order to use config file explicitly via customized python script, I wanna sol
 
 2. How the json config file is parsed?  
 
-I found that answering the first question is enough to create customized python script. For the second question, I found that the whole design philoshophy is built for parsing json config file, and the offical guide has the answer for [this question](https://guide.allennlp.org/using-config-files#2).
 
-## Analyzing how `allennlp train/predict/...` commmands work?
+## How `AllenNLP` commands and subcommands work?
 Here, I use `allennlp train` command as example.
 
 ### Where is the entry point?
@@ -58,7 +57,12 @@ args.func(args)
 ```
 
 ### Creating the python script
-According to the analysis, I make the transparent and [simple python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py) which achieve the same behaviour of `allennlp train`.
+According to the analysis, I make the transparent and [simple python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py) which achieve the same behaviour of `allennlp train`. But this just explains the argument parsing trick of `allennlp`. This is not enough if we would like to use the config file for other usages besides training and others provided by `allennlp.commands`.
+
+##  How the json config file is parsed? 
+The main design philoshophy of `allennlp` is to construct all objects in `allennlp` with only the json file. This is inspired by the idea of **dependency injection**. The offical guide has the introduction for [this](https://guide.allennlp.org/using-config-files).
+
+
 
 
 
