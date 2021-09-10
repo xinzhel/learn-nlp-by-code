@@ -1,14 +1,10 @@
-# AllenNLP: how to use config file explicitly via simple, customized python script?
+# AllenNLP: Analyzing its mysterious allennlp commands and JSON files
+AllenNLP provides an agile experimental tool via only **JSON configuration (or config) files** and its **commands (subcommands)**. However, as a programmer, I am not happy when many implementations are unknown.
 
+Therefore, to ensure I have clearly analyzed the mysteries behind allennlp commands and JSON files in this post, I set two practical goals:
+1. use customized python script rather than `AllenNLP` commands and subcommands: To achieve this, I need to explore: **How `AllenNLP` commands and subcommands work (i.e., `allennlp train ...` for training)?**. At the end, [this simple, more transparent python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py) is generated to achieve the same behaviour of `allennlp train` command.
+2. construct all the objects by myself for the training process: To achieve this, I need to explore: **How the json config file is parsed?**. Note that the above goal just explains how command line arguments are parsed, but the mystery of parsing JSON files into Python objects and organizing them for training is still unknown in the class `TrainModel` in this simple, more transparent python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py). 
 
-In order to use config file explicitly via customized python script, I wanna solve the following two questions:
-
-1. How `AllenNLP` commands and subcommands work (i.e., `allennlp train ...` for training)? 
-
-2. How the json config file is parsed?  
-
-## Background
-`allennlp` uses a json file to construct the objects.
 
 ## How `AllenNLP` commands and subcommands work?
 Here, I use `allennlp train` command as example.
@@ -60,11 +56,12 @@ args = parser.parse_args()
 args.func(args)
 ```
 
-### Creating the python script
-According to the analysis, I make the transparent and [simple python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py) which achieve the same behaviour of `allennlp train`. But this just explains the argument parsing trick of `allennlp`. This is not enough if we would like to use the config file for other usages besides training and others provided by `allennlp.commands`.
 
-##  How the json config file is parsed? 
-The main design principle of `allennlp` is to construct all objects in `allennlp` with only the json file. This is implemented with ` `FromParams` which is the base class for all the classes in `allennlp`. For example, we could easily construct the model defined below via a JSON dictionary `{"input_size": 64, "output_size": 2}`.
+##  How the JSON config file is parsed? 
+The main design principle of `allennlp` is to construct all objects in `allennlp` with only the json file. [Here](https://github.com/allenai/allennlp-models/blob/main/training_config/classification/basic_stanford_sentiment_treebank.jsonnet) is a JSON file specified for training a classification model. This could be  I wanna fully understand how this JSON file works via the following analysis.
+
+### from the JSON file to Python objectsI
+This is implemented with ` `FromParams` which is inherited by all the classes in `allennlp`. For example, we could easily construct the model defined below via a JSON dictionary `{"input_size": 64, "output_size": 2}`.
 
 ```
 from allennlp.common import FromParams
@@ -87,18 +84,16 @@ model = Model.from_params(params)
 Since this part has been explained very well in the [official guide], I just summarize some points to benefit further exploration.
 * JSON key parsing: match class argument names of objects to be constructed.
 * JSON value parsing: type annotation (e.g., int) is used to parse values from JSON into correct data types of class arguments for objects to be constructed. 
+* Recursively parsing: If an argument of `Model` are another `Model` object or any object requiring arguments, this could be defined by nested JSON dictionary. Of course, the object has to be constructed from the class inheriting `FromParam`. This actually limits us to directly use Pytorch code if we want to benefit from JSON definitions.
+
+### 
+I think, if we have workflows containing many unstructured objects, this idea would lead to messy json files. But objects required for deep learning workflows (e.g., training) tend to have common operations and could be collected into a few abstract classes (e.g., `Model`, `DataReader`). This idea is actually one of foundamental objected-oriented priciples: polymorphism where abstract base classes encapsulate common operations, and concrete instantiations handle low-level details of data processing or model operations.
+
+## AllenNLP registration design
+
+Specifically, `allennlp` uses `Registrable` 
 
 
-
-Actually, if we have workflows containing many unstructured objects, this idea would lead to messy json files. But objects required for deep learning workflows (e.g., training) tend to have common operations and could be collected into a few abstract classes (e.g., `Model`, `DataReader`). This is indeed the concept of polymorphism which would be discussed lastly as an optional part.
-
-### How this construction could be performed recursively?
-
-
-### (Optional) How to deal with the polymorphism?
-
-* abstract base classes: encapsulate common operations
-* concrete instantiations: low-level details of data processing or model operations
 
 
 `Registration`: decorator 
@@ -107,9 +102,6 @@ Actually, if we have workflows containing many unstructured objects, this idea w
 TrainModel.register("default", constructor="from_partial_objects")(TrainModel)
 ```
 
-
-
-## (Optional) AllenNLP registration design
 All the subclasses are registered in the high-level abstract class, and they could be easilly assessed. For example, we could access the `allennlp.commands.train.Train` class via `Subcommand.by_name('train')` or `allennlp.commands.predict.Predict` class via `Subcommand.by_name('predict')`. It's kinda like a factory with all the templates (i.e., the subclasses), and you can create instances as many as you want from one place. The official guide has discussed the usage of [registration](https://guide.allennlp.org/using-config-files#3).
 
 
