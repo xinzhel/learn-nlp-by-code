@@ -3,7 +3,9 @@ AllenNLP provides an agile experimental tool via only **JSON configuration (or c
 
 Therefore, to ensure I have clearly analyzed the mysteries behind allennlp commands and JSON files in this post, I set two practical goals:
 1. use customized python script rather than `AllenNLP` commands and subcommands: To achieve this, I need to explore: **How `AllenNLP` commands and subcommands work (i.e., `allennlp train ...` for training)?**. At the end, [this simple, more transparent python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py) is generated to achieve the same behaviour of `allennlp train` command.
-2. construct all the objects by myself for the training process: To achieve this, I need to explore: **How the json config file is parsed?**. Note that the above goal just explains how command line arguments are parsed, but the mystery of parsing JSON files into Python objects and organizing them for training is still unknown in the class `TrainModel` in this simple, more transparent python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py). 
+2. construct all the objects by myself for the training process: To achieve this, I need to explore: **How the json config file is parsed?**. Note that the above goal just explains how command line arguments are parsed, but the mystery of parsing JSON files into Python objects and organizing them for training is still unknown in the class `TrainModel` in [this simple, more transparent python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py). 
+
+BTW, for those reading this post, I recommend trying to use provided debug codes in [my github](https://github.com/xinzhel/allennlp-code-analysis) for fully understanding since I don't think only my writing is good enough for most of people to easily understand the complicated allennlp design (I use it for more than half an year but still not fully understand).
 
 
 ## How `AllenNLP` commands and subcommands work?
@@ -60,7 +62,7 @@ args.func(args)
 ##  How the JSON config file is parsed? 
 The main design principle of `allennlp` is to construct all objects in `allennlp` with only the json file. [Here](https://github.com/allenai/allennlp-models/blob/main/training_config/classification/basic_stanford_sentiment_treebank.jsonnet) is a JSON file specified for training a classification model. This could be  I wanna fully understand how this JSON file works via the following analysis.
 
-### from the JSON file to Python objectsI
+### from the JSON file to Python objects
 This is implemented with ` `FromParams` which is inherited by all the classes in `allennlp`. For example, we could easily construct the model defined below via a JSON dictionary `{"input_size": 64, "output_size": 2}`.
 
 ```
