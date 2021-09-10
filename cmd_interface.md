@@ -64,9 +64,48 @@ args.func(args)
 According to the analysis, I make the transparent and [simple python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py) which achieve the same behaviour of `allennlp train`. But this just explains the argument parsing trick of `allennlp`. This is not enough if we would like to use the config file for other usages besides training and others provided by `allennlp.commands`.
 
 ##  How the json config file is parsed? 
-The main design philoshophy of `allennlp` is to construct all objects in `allennlp` with only the json file. This is inspired by the idea of **dependency injection**. The offical guide has the introduction for [this](https://guide.allennlp.org/using-config-files).
+The main design principle of `allennlp` is to construct all objects in `allennlp` with only the json file. This is implemented with ` `FromParams` which is the base class for all the classes in `allennlp`. For example, we could easily construct the model defined below via a JSON dictionary `{"input_size": 64, "output_size": 2}`.
+
+```
+from allennlp.common import FromParams
+
+class Model(FromParams):
+    def __init__(self, input_size: int, output_size: int):
+        self.linear = nn.Linear(input_size, output_size)
+        self.output_size = output_size
+```
+Specifically, this JSON dictionary could be read from a JSON file
+
+```
+from allennlp.common import Params
+import json
+
+params = Params(json.loads(file_path))
+model = Model.from_params(params)
+```
+
+Since this part has been explained very well in the [official guide], I just summarize some points to benefit further exploration.
+* JSON key parsing: match class argument names of objects to be constructed.
+* JSON value parsing: type annotation (e.g., int) is used to parse values from JSON into correct data types of class arguments for objects to be constructed. 
 
 
+
+Actually, if we have workflows containing many unstructured objects, this idea would lead to messy json files. But objects required for deep learning workflows (e.g., training) tend to have common operations and could be collected into a few abstract classes (e.g., `Model`, `DataReader`). This is indeed the concept of polymorphism which would be discussed lastly as an optional part.
+
+### How this construction could be performed recursively?
+
+
+### (Optional) How to deal with the polymorphism?
+
+* abstract base classes: encapsulate common operations
+* concrete instantiations: low-level details of data processing or model operations
+
+
+`Registration`: decorator 
+
+```
+TrainModel.register("default", constructor="from_partial_objects")(TrainModel)
+```
 
 
 
@@ -75,10 +114,13 @@ All the subclasses are registered in the high-level abstract class, and they cou
 
 
 
+**polymorphic dependency injection**
 
 
 
 
 
+## Reference
+[The offical guide](https://guide.allennlp.org/using-config-files).
 
 
