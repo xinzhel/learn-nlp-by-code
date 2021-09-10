@@ -1,5 +1,5 @@
 # AllenNLP: Analyzing its mysterious allennlp commands and JSON files
-AllenNLP provides an agile experimental tool via only **JSON configuration (or config) files** and its **commands (subcommands)**. However, as a programmer, I am not happy when many implementations are unknown.
+AllenNLP provides an agile experimental tool via only **JSON configuration (or config) files** like [this one](https://github.com/allenai/allennlp-models/blob/main/training_config/classification/basic_stanford_sentiment_treebank.jsonnet) and its **commands (subcommands)**. However, as a programmer, I am not happy when many implementations are unknown.
 
 Therefore, to ensure I have clearly analyzed the mysteries behind allennlp commands and JSON files in this post, I set two practical goals:
 1. use customized python script rather than `AllenNLP` commands and subcommands: To achieve this, I need to explore: **How `AllenNLP` commands and subcommands work (i.e., `allennlp train ...` for training)?**. At the end, [this simple, more transparent python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py) is generated to achieve the same behaviour of `allennlp train` command.
@@ -58,12 +58,34 @@ args = parser.parse_args()
 args.func(args)
 ```
 
+Therefore, to replicate the behaviour of the command (`allennlp`) and subcommand (`train`) in a python script, I only need to implement two functions by myself in the [Python scirpt](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py):
+1. the argument parsing function: this correponds to `allennlp.commands.train.Trainadd_subparser`.
+2. the train function: this corresponds to `allennlp.commands.train.train_model_from_file`. Since the detail of this function relates to the next topic, I directly call the function and leave the rewriting work as the goal for the next challenge.
 
-##  How the JSON config file is parsed? 
-The main design principle of `allennlp` is to construct all objects in `allennlp` with only the json file. [Here](https://github.com/allenai/allennlp-models/blob/main/training_config/classification/basic_stanford_sentiment_treebank.jsonnet) is a JSON file specified for training a classification model. This could be  I wanna fully understand how this JSON file works via the following analysis.
 
-### from the JSON file to Python objects
-This is implemented with ` `FromParams` which is inherited by all the classes in `allennlp`. For example, we could easily construct the model defined below via a JSON dictionary `{"input_size": 64, "output_size": 2}`.
+##  How the JSON config file is parsed?
+Following the [Python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py), now, `train_model_from_file` could be further explored to see the parsing of [a JSON file](https://github.com/allenai/allennlp-models/blob/main/training_config/classification/basic_stanford_sentiment_treebank.jsonnet) specified for training a model. See the comment and code.
+
+```
+def train_model_from_file(...):
+    # this would parse the JSON file to a dictionary
+    params = Params.from_file(parameter_filename, overrides)
+
+    # FINALLY, this would construct all objects according to the information in JSON file. The detail is shown in the following subsection.
+    train_loop = TrainModel.from_params(
+        params=params,
+        serialization_dir=serialization_dir,
+        local_rank=0,
+    )
+    metrics = train_loop.run()
+    train_loop.finish(metrics)
+    model = train_loop.model
+    return model
+```
+
+
+### from_params: from the JSON file to Python objects
+This is implemented with the class `FromParams` which is inherited by all the classes in `allennlp`. For example, we could easily construct the model defined below via a JSON dictionary `{"input_size": 64, "output_size": 2}`.
 
 ```
 from allennlp.common import FromParams
