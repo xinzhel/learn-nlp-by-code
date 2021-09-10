@@ -1,10 +1,14 @@
 # AllenNLP: how to use config file explicitly via simple, customized python script?
+
+
 In order to use config file explicitly via customized python script, I wanna solve the following two questions:
 
 1. How `AllenNLP` commands and subcommands work (i.e., `allennlp train ...` for training)? 
 
 2. How the json config file is parsed?  
 
+## Background
+`allennlp` uses a json file to construct the objects.
 
 ## How `AllenNLP` commands and subcommands work?
 Here, I use `allennlp train` command as example.
