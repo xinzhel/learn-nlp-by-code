@@ -85,22 +85,20 @@ def train_model_from_file(...):
 
 
 ### from_params: from the JSON file to Python objects
-This is implemented with the class `FromParams` which is inherited by all the classes in `allennlp`. For example, we could easily construct the model defined below via a JSON dictionary `{"input_size": 64, "output_size": 2}`.
+This is implemented with the class `FromParams` which is inherited by all the classes in `allennlp`, specifically, the `FromParams.from_params` method. For example, we could easily construct the model defined below via a JSON dictionary `{"input_size": 64, "output_size": 2}`.
 
 ```
 from allennlp.common import FromParams
+from allennlp.common import Params
+import json
 
 class Model(FromParams):
     def __init__(self, input_size: int, output_size: int):
         self.linear = nn.Linear(input_size, output_size)
         self.output_size = output_size
-```
-Specifically, this JSON dictionary could be read from a JSON file
+        
 
-```
-from allennlp.common import Params
-import json
-
+#  params is a dictionary constructed by reading the JSON file in `file_path`
 params = Params(json.loads(file_path))
 model = Model.from_params(params)
 ```
@@ -110,23 +108,54 @@ Since this part has been explained very well in the [official guide], I just sum
 * JSON value parsing: type annotation (e.g., int) is used to parse values from JSON into correct data types of class arguments for objects to be constructed. 
 * Recursively parsing: If an argument of `Model` are another `Model` object or any object requiring arguments, this could be defined by nested JSON dictionary. Of course, the object has to be constructed from the class inheriting `FromParam`. This actually limits us to directly use Pytorch code if we want to benefit from JSON definitions.
 
+Now, we know where ` TrainModel.from_params` comes from to parse the JSON file. If we want to see immplementation of parsing, we could look at the [source code of `FromParams`](https://github.com/allenai/allennlp/blob/5338bd8b4a7492e003528fe607210d2acc2219f5/allennlp/common/from_params.py#L558). 
+
+
+
 
 ## (Optional) AllenNLP registration design
-I think, if we have workflows containing many unstructured objects, this idea would lead to messy json files. But objects required for deep learning workflows (e.g., training) tend to have common operations and could be collected into a few abstract classes (e.g., `Model`, `DataReader`). This idea is actually one of foundamental objected-oriented priciples: polymorphism where abstract base classes encapsulate common operations, and concrete instantiations handle low-level details of data processing or model operations.
-
-Specifically, all the ABSTRACT classes would inherit from the `Registrable` class so that they could register all concrete instantiations (i.e., the subclasses). 
-
-`Registration`: decorator 
+I think, if we have workflows containing many unstructured objects, this idea would lead to messy json files. But objects required for deep learning workflows (e.g., training) tend to have common operations and could be collected into a few abstract classes (e.g., `Model`, `DataReader`). This idea is actually one of foundamental objected-oriented priciples: polymorphism where **abstract base classes** encapsulate common operations, and **concrete subclasses** handle low-level details of data processing or model operations. In order to make **abstract base classes** have the ability to create objects of **concrete subclasses**, `allennlp` uses registration design which is implemented as the `Registrable` base class. The code is as below.
 
 ```
-TrainModel.register("default", constructor="from_partial_objects")(TrainModel)
+class Registrable(FromParams):
+   
+    _registry: ClassVar[DefaultDict[type, _SubclassRegistry]] = defaultdict(dict)
+
+    default_implementation: Optional[str] = None
+    
+     @classmethod
+    def register(
+        cls, name: str, constructor: Optional[str] = None, exist_ok: bool = False
+    ) -> Callable[[Type[_T]], Type[_T]]:
+        ...
+```
+* 1st line: An abstract class inherited from the `Registrable` class could access all its concrete subclasses in the named registry `_registry`.
+* 2nd line: If the JSON dictionary does not specify the concrete subclass via the 'type' key, `default_implementation` would be used.
+* 3rd to 5th lines: To be able to access all the subclasses, we need to decorate all the subclasses via `@BaseClass.register(name)` (e.g., @Model.register("my_model_name")) or manually call `@BaseClass.register(name)(class)`. the argument `constructor` is to define the class method to create the object. I guess this is used by `from_params` method to construct objects. 
+
+Let's manually register a default implementation for the `Model` class defined above.
+```
+from allennlp.common import FromParams
+
+class Model(FromParams):
+    default_implementation = "xxx"
+    def __init__(self, input_size: int, output_size: int):
+        self.linear = nn.Linear(input_size, output_size)
+        self.output_size = output_size
+Model.register("xxx")(LSTM)
 ```
 
-All the subclasses are registered in the high-level abstract class, and they could be easilly assessed. For example, we could access the `allennlp.commands.train.Train` class via `Subcommand.by_name('train')` or `allennlp.commands.predict.Predict` class via `Subcommand.by_name('predict')`.  with all the templates, and you can create instances as many as you want from one place. The official guide has discussed the usage of [registration](https://guide.allennlp.org/using-config-files#3).
+Now, the default implementation is `LSTM`, and I name it as 'xxx' just to show that any names would be acceptable. Of course, we can use decorator.
+
+```
+Model.register("xxx")
+class LSTM(Model):
+    def __init(self, ...):
+        super().init(...)
+    
+```
 
 
-
-**polymorphic dependency injection**
 
 
 
