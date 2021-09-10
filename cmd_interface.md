@@ -110,15 +110,11 @@ Since this part has been explained very well in the [official guide], I just sum
 * JSON value parsing: type annotation (e.g., int) is used to parse values from JSON into correct data types of class arguments for objects to be constructed. 
 * Recursively parsing: If an argument of `Model` are another `Model` object or any object requiring arguments, this could be defined by nested JSON dictionary. Of course, the object has to be constructed from the class inheriting `FromParam`. This actually limits us to directly use Pytorch code if we want to benefit from JSON definitions.
 
-### 
+
+## (Optional) AllenNLP registration design
 I think, if we have workflows containing many unstructured objects, this idea would lead to messy json files. But objects required for deep learning workflows (e.g., training) tend to have common operations and could be collected into a few abstract classes (e.g., `Model`, `DataReader`). This idea is actually one of foundamental objected-oriented priciples: polymorphism where abstract base classes encapsulate common operations, and concrete instantiations handle low-level details of data processing or model operations.
 
-## AllenNLP registration design
-
-Specifically, `allennlp` uses `Registrable` 
-
-
-
+Specifically, all the ABSTRACT classes would inherit from the `Registrable` class so that they could register all concrete instantiations (i.e., the subclasses). 
 
 `Registration`: decorator 
 
@@ -126,7 +122,7 @@ Specifically, `allennlp` uses `Registrable`
 TrainModel.register("default", constructor="from_partial_objects")(TrainModel)
 ```
 
-All the subclasses are registered in the high-level abstract class, and they could be easilly assessed. For example, we could access the `allennlp.commands.train.Train` class via `Subcommand.by_name('train')` or `allennlp.commands.predict.Predict` class via `Subcommand.by_name('predict')`. It's kinda like a factory with all the templates (i.e., the subclasses), and you can create instances as many as you want from one place. The official guide has discussed the usage of [registration](https://guide.allennlp.org/using-config-files#3).
+All the subclasses are registered in the high-level abstract class, and they could be easilly assessed. For example, we could access the `allennlp.commands.train.Train` class via `Subcommand.by_name('train')` or `allennlp.commands.predict.Predict` class via `Subcommand.by_name('predict')`.  with all the templates, and you can create instances as many as you want from one place. The official guide has discussed the usage of [registration](https://guide.allennlp.org/using-config-files#3).
 
 
 
