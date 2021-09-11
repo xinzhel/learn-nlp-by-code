@@ -108,12 +108,12 @@ Since this part has been explained very well in the [official guide], I just sum
 * JSON value parsing: type annotation (e.g., int) is used to parse values from JSON into correct data types of class arguments for objects to be constructed. 
 * Recursively parsing: If an argument of `Model` are another `Model` object or any object requiring arguments, this could be defined by nested JSON dictionary. Of course, the object has to be constructed from the class inheriting `FromParam`. This actually limits us to directly use Pytorch code if we want to benefit from JSON definitions.
 
-Now, we know where ` TrainModel.from_params` comes from to parse the JSON file. If we want to see immplementation of parsing, we could look at the [source code of `FromParams`](https://github.com/allenai/allennlp/blob/5338bd8b4a7492e003528fe607210d2acc2219f5/allennlp/common/from_params.py#L558). 
+Now, we know where ` TrainModel.from_params` comes from to parse the JSON file. If we want to see immplementation of parsing, we could look at the [source code of `FromParams`](https://github.com/allenai/allennlp/blob/5338bd8b4a7492e003528fe607210d2acc2219f5/allennlp/common/from_params.py#L558). However, once we look at `TrainModel` class, it inherits from `Registrable` class. Next, I'll explain this.
 
 
 
 
-## (Optional) AllenNLP registration design
+### Registrable: registration design
 I think, if we have workflows containing many unstructured objects, this idea would lead to messy json files. But objects required for deep learning workflows (e.g., training) tend to have common operations and could be collected into a few abstract classes (e.g., `Model`, `DataReader`). This idea is actually one of foundamental objected-oriented priciples: polymorphism where **abstract base classes** encapsulate common operations, and **concrete subclasses** handle low-level details of data processing or model operations. In order to make **abstract base classes** have the ability to create objects of **concrete subclasses**, `allennlp` uses registration design which is implemented as the `Registrable` base class. The code is as below.
 
 ```
@@ -155,7 +155,19 @@ class LSTM(Model):
     
 ```
 
+I think that the understanding is enough for me to implement the functionality of `TrainModel` by myself. 
 
+First, in order to find where `TrainModel` constructs objects (e.g., `Model`, `DataReader`), we need to find how it is constructed. Since it inherits`Registrable`, we need to find the default constructor of `TrainModel`. The code is shown below. 
+```
+TrainModel.register("default", constructor="from_partial_objects")(TrainModel)
+```
+In the `from_params` method, one line as below could be found to fetch the rigistry of subclasses.
+```
+registered_subclasses = Registrable._registry.get(cls)
+# if cls is TrainModel, `registered_subclasses` would be: {'default': (<class 'allennlp....TrainModel'>, 'from_partial_objects')}
+```
+
+`TrainModel` registers itself as the default implementation and constructs an object using `from_partial_object`. When we look at this class method, we could find the basic objects are constructed according to the params from JSON files (e.g., `serialization_dir`) and command line arguments (e.g., `serialization_dir`). The following code is easy to understand for anyone familiar with object-oriented programming.
 
 
 
