@@ -1,3 +1,4 @@
+I found that `AllenNLP` is a kinda unique NLP tool to be implemented fundamentally via NLP logic.
 # AllenNLP: Analyzing its mysterious allennlp commands and JSON files
 AllenNLP provides an agile experimental tool via only **JSON configuration (or config) files** like [this one](https://github.com/allenai/allennlp-models/blob/main/training_config/classification/basic_stanford_sentiment_treebank.jsonnet) and its **commands (subcommands)**. However, as a programmer, I am not happy when many implementations are unknown.
 
