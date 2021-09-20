@@ -1,7 +1,10 @@
 "Talk is cheap, show me the code."
 
-I love to go through the details of the code. Here is those in my list.
+I would go through the details of code for NLP implementations for both learning purpose and practical research. Packages include
 * [AllenNLP](https://github.com/allenai/allennlp)
 * [FairSeq](https://github.com/pytorch/fairseq)
+* Python
+* Pytorch
+* SpaCy
 
  
