@@ -1,8 +1,12 @@
-I found that `AllenNLP` is a kinda unique NLP tool to be implemented fundamentally via a logic combining typical NLP with deep learning .
-# AllenNLP: Analyzing its mysterious allennlp commands and JSON files
-AllenNLP provides an agile experimental tool via only **JSON configuration (or config) files** like [this one](https://github.com/allenai/allennlp-models/blob/main/training_config/classification/basic_stanford_sentiment_treebank.jsonnet) and its **commands (subcommands)**. However, as a programmer, I am not happy when many implementations are unknown.
+I found that `AllenNLP` is a kinda unique NLP tool to be implemented fundamentally via a logic combining typical NLP with deep learning. In this file, I mainly analyze 
 
-Therefore, to ensure I have clearly analyzed the mysteries behind allennlp commands and JSON files in this post, I set two practical goals:
+**how allennlp commands and JSON files work behind the scene?**
+
+AllenNLP provides an agile experimental tool via only **JSON configuration (or config) files** like [this one](https://github.com/allenai/allennlp-models/blob/main/training_config/classification/basic_stanford_sentiment_treebank.jsonnet) and its **commands (subcommands)**. I am curious how these are implemented. 
+
+The biggest goal (or motivation) is to **fully control the process (e.g., the training process)**. This benefits me 
+* make the script to suit my own requirements (e.g., add a  )
+
 1. use customized python script rather than `AllenNLP` commands and subcommands: To achieve this, I need to explore: **How `AllenNLP` commands and subcommands work (i.e., `allennlp train ...` for training)?**. At the end, [this simple, more transparent python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py) is generated to achieve the same behaviour of `allennlp train` command.
 2. construct all the objects by myself for the training process: To achieve this, I need to explore: **How the json config file is parsed?**. Note that the above goal just explains how command line arguments are parsed, but the mystery of parsing JSON files into Python objects and organizing them for training is still unknown in the class `TrainModel` in [this simple, more transparent python script](https://github.com/xinzhel/allennlp-code-analysis/blob/master/scripts/main_clean_train.py). 
 
