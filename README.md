@@ -5,6 +5,7 @@ I would go through the details of code for NLP implementations for both learning
 * [FairSeq](https://github.com/pytorch/fairseq)
 * Python
 * Pytorch
+  * [AutoGrad](https://www.kaggle.com/sergioli212/autograd-behind-gradient-descent)
 * SpaCy
 
  
