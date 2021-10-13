@@ -4,6 +4,7 @@ I would go through the following packages for both learning purpose and practica
 
 * Python
 * Pytorch
+  * [`nn.Module` for building neural network](https://www.kaggle.com/sergioli212/neural-network-pytorch-module) 
   * [AutoGrad](https://www.kaggle.com/sergioli212/autograd-behind-gradient-descent)
 * SpaCy
 * AllenNLP
