@@ -1,4 +1,4 @@
-I 😍 the quote: "Talk is cheap, show me the code." So I made this repository to record my code analysis for popular machine learning and Natural Language Processing libraries or frameworks.
+I 😍 the quote: "Talk is cheap, show me the code." So I decide to make this repository to record my code analysis for popular machine learning and Natural Language Processing libraries or frameworks.
 
 I would go through the following packages for both learning purpose and practical research. Some of code analysis are linked to my notebooks on Kaggle for easy running.
 
