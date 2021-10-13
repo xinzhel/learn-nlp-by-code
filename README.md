@@ -4,7 +4,6 @@ I would go through the following packages for both learning purpose and practica
 
 * Python
 * Pytorch
-  * [Neural Network](https://www.kaggle.com/sergioli212/neural-network-from-a-buzzword-to-math)
   * [AutoGrad](https://www.kaggle.com/sergioli212/autograd-behind-gradient-descent)
 * SpaCy
 * AllenNLP
